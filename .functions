@@ -1,0 +1,54 @@
+# Function for changing to any directory inside vhosts
+function s {
+        cd /Users/Josh/Server/vhosts/$1.dev/httpdocs
+}
+
+# Make a directory
+function md {
+        mkdir -p "$@" && cd "$@" 
+}
+
+# Find shorthand
+function f() {
+	find . -name "$1"
+}
+
+# cd into whatever is the forefront Finder window.
+cdf() {
+	cd "`osascript -e 'tell app "Finder" to POSIX path of (insertion location as alias)'`"
+}
+
+# Remove all them fecking _notes directories dreamweaver creates
+rmdw() {
+	find . -name '_notes' -print0 | xargs -0 rm -rf
+}
+
+# Test if HTTP compression (RFC 2616 + SDCH) is enabled for a given URL.
+# Send a fake UA string for sites that sniff it instead of using the Accept-Encoding header. (Looking at you, ajax.googleapis.com!)
+function httpcompression() {
+	encoding="$(curl -LIs -H 'User-Agent: Mozilla/5 Gecko' -H 'Accept-Encoding: gzip,deflate,compress,sdch' "$1" | grep '^Content-Encoding:')" && echo "$1 is encoded using ${encoding#* }" || echo "$1 is not using any encoding"
+}
+
+# Count the number of selectors in a CSS file
+csscount() {
+    cnt=0
+    depth=0
+    while read -n 1 char; do
+            case $char in
+                    "{")
+                            ((depth++))
+                            ;;
+                    "}")
+                            ((depth--))
+                            if [ "$depth" -eq "0" ]; then
+                                    ((cnt++))
+                            fi
+                            ;;
+                    ",")
+                            ((cnt++))
+                            ;;
+            esac
+    done
+ 
+    echo $cnt
+}
